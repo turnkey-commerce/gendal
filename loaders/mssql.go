@@ -7,8 +7,8 @@ import (
 
 	"github.com/knq/snaker"
 
-	"github.com/xo/xo/internal"
-	"github.com/xo/xo/models"
+	"github.com/turnkey-commerce/gendal/internal"
+	"github.com/turnkey-commerce/gendal/models"
 )
 
 func init() {

@@ -3,8 +3,8 @@ package loaders_test
 import (
 	"testing"
 
-	"github.com/xo/xo/internal"
-	"github.com/xo/xo/loaders"
+	"github.com/turnkey-commerce/gendal/internal"
+	"github.com/turnkey-commerce/gendal/loaders"
 )
 
 func Test_MyParseType(t *testing.T) {

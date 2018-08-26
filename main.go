@@ -17,10 +17,10 @@ import (
 	"github.com/alexflint/go-arg"
 
 	"github.com/xo/dburl"
-	"github.com/xo/xo/internal"
-	"github.com/xo/xo/models"
+	"github.com/turnkey-commerce/gendal/internal"
+	"github.com/turnkey-commerce/gendal/models"
 
-	_ "github.com/xo/xo/loaders"
+	_ "github.com/turnkey-commerce/gendal/loaders"
 	_ "github.com/xo/xoutil"
 )
 
