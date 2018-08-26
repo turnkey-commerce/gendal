@@ -8,9 +8,9 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/knq/dburl"
+	"github.com/xo/dburl"
 
-	"github.com/knq/xo/examples/booktest/cockroachdb/models"
+	"github.com/turnkey-commerce/gendal/examples/booktest/cockroachdb/models"
 )
 
 var flagVerbose = flag.Bool("v", false, "verbose")
