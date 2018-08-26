@@ -14,9 +14,9 @@ fi
 
 EXTRA=$2
 
-XOBIN=$(which xo)
-if [ -e ./xo ]; then
-  XOBIN=./xo
+XOBIN=$(which gendal)
+if [ -e ./gendal ]; then
+  XOBIN=./gendal
 fi
 
 set -ex

@@ -4,9 +4,9 @@ EXTRA=$1
 
 SRC=$(realpath $(cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd ))
 
-XOBIN=$(which xo)
-if [ -e $SRC/../../xo ]; then
-  XOBIN=$SRC/../../xo
+XOBIN=$(which gendal)
+if [ -e $SRC/../../gendal ]; then
+  XOBIN=$SRC/../../gendal
 fi
 
 set -e
