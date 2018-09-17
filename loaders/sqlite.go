@@ -181,15 +181,36 @@ func SqTableColumns(db models.XODB, schema string, table string) ([]*models.Colu
 
 	// fix columns
 	var cols []*models.Column
+	var pks []*models.Column
 	for _, row := range rows {
-		cols = append(cols, &models.Column{
+		col := models.Column{
 			FieldOrdinal: row.FieldOrdinal,
 			ColumnName:   row.ColumnName,
 			DataType:     row.DataType,
 			NotNull:      row.NotNull,
 			DefaultValue: row.DefaultValue,
 			IsPrimaryKey: row.PkColIndex != 0,
-		})
+		}
+		cols = append(cols, &col)
+		if col.IsPrimaryKey {
+			pks = append(pks, &col)
+		}
+	}
+
+	// if there's a single primary key which is INTEGER in a rowid table, it's an alias for rowid thus not null.
+	if len(pks) == 1 {
+		pk := pks[0]
+
+		// if it's a WITHOUT ROWID table, this will fail.
+		q, err := db.Query("SELECT ROWID FROM " + table + " LIMIT 1")
+		if err != nil {
+			return cols, nil
+		}
+		defer q.Close()
+
+		if strings.EqualFold(pk.DataType, "INTEGER") {
+			pk.NotNull = true
+		}
 	}
 
 	return cols, nil
