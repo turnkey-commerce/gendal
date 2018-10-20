@@ -469,6 +469,19 @@ func (tl TypeLoader) LoadRelkind(args *ArgType, relType RelType) (map[string]*Ty
 	// tables
 	tableMap := make(map[string]*Type)
 	for _, ti := range tableList {
+		ignore := false
+		for _, ignoreTable := range args.IgnoreTables {
+			if strings.ToLower(ignoreTable) == strings.ToLower(ti.TableName) {
+				// Skip adding this table if users has specified ignore
+				ignore = true
+				break
+			}
+		}
+
+		if ignore {
+			continue
+		}
+
 		// create template
 		typeTpl := &Type{
 			Name:    SingularizeIdentifier(ti.TableName),
@@ -513,7 +526,7 @@ func (tl TypeLoader) LoadColumns(args *ArgType, typeTpl *Type) error {
 		ignore := false
 
 		for _, ignoreField := range args.IgnoreFields {
-			if ignoreField == c.ColumnName {
+			if strings.ToLower(ignoreField) == strings.ToLower(c.ColumnName) {
 				// Skip adding this field if user has specified they are not
 				// interested.
 				//

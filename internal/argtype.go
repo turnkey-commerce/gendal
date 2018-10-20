@@ -8,7 +8,8 @@ type ArgType struct {
 	Verbose bool `arg:"-v,help:toggle verbose"`
 
 	// DSN is the database string (ie, pgsql://user@blah:localhost:5432/dbname?args=)
-	DSN string `arg:"positional,required,help:data source name"`
+	// It is no longer required since the value can also come from a config file.
+	DSN string `arg:"positional,help:data source name"`
 
 	// Schema is the name of the schema to query.
 	Schema string `arg:"-s,help:schema name to generate Go types for"`
@@ -24,7 +25,7 @@ type ArgType struct {
 	// Suffix is the output suffix for filenames.
 	Suffix string `arg:"-f,help:output file suffix"`
 
-	// SingleFile when toggled changes behavior so that output is to one f ile.
+	// SingleFile when toggled changes behavior so that output is to one file.
 	SingleFile bool `arg:"--single-file,help:toggle single file output"`
 
 	// Package is the name used to generate package headers. If not specified,
@@ -43,6 +44,10 @@ type ArgType struct {
 	// IgnoreFields allows the user to specify field names which should not be
 	// handled by xo in the generated code.
 	IgnoreFields []string `arg:"--ignore-fields,help:fields to exclude from the generated Go code types"`
+
+	// IgnoreTables allows the user to specify table names which should not be
+	// handled by xo in the generated code.
+	IgnoreTables []string `arg:"--ignore-tables,help:tables to exclude from the generated Go code types"`
 
 	// ForeignKeyMode is the foreign key mode for generating foreign key names.
 	ForeignKeyMode *FkMode `arg:"--fk-mode,-k,help:sets mode for naming foreign key funcs in generated Go code [values: <smart|parent|field|key>]"`

@@ -1,0 +1,136 @@
+# DSN sets the connection to the database in the form of a URL
+# See https://github.com/xo/dburl for more info.
+# The URL is of the form:
+# protocol+transport://user:pass@host/dbname?opt1=a&opt2=b
+#
+# For example for Postgres it is of the form:
+#    "postgres://user:pass@host/dbname?sslmode=disable"
+# And for SQLite would be of the form:
+#    "sqlite:mydatabase.db"
+DSN = "postgres://booktest:booktest@localhost/booktest?sslmode=disable"
+
+# Schema sets the database schema name to generate the Go types.
+# If it is not set then the default active schema for the connection is used.
+Schema = ""
+
+# Out sets the directory or file name where the generated code will be built
+# as well as the naming of the package for the generated code.
+Out = "models"
+
+# Package sets the name of the package for the generated files.
+# If it is not set then the name of the output directory is used instead.
+Package = ""
+
+# SingleFile specifies to output all of the file generation to a single file
+# if the Out was set to a file name (true or false)
+SingleFile = false
+
+# IgnoreTables sets a comma-separated list of table names to ignore.
+# e.g. ["books", "authors"]
+IgnoreTables = []
+
+# IgnoreFields sets a comma-separated list of column names to ignore.
+# e.g. ["time_created", "time_updated"]
+IgnoreFields = []
+
+# TemplatePath sets the path for user-defined templates.
+TemplatePath = ""
+
+# Suffix is the file suffix for the generated files.
+Suffix = ".xo.go"
+
+# CustomTypePackage is the Go package name to use for custom or unknown types.
+CustomTypePackage = ""
+
+# Int32Type is the Go type to assign those discovered as int32 (ie, serial, integer, etc).
+Int32Type = "int"
+
+# Uint32Type is the type to assign those discovered as uint32.
+Uint32Type = "uint"
+
+# ForeignKeyMode is the foreign key mode for generating the name of functions
+# involving foreign keys.
+# (0 for smart, 1 for parent, 2 for field, 3 for key)
+ForeignKeyMode = 0
+
+# UseIndexNames sets whether to use index names as defined by the database.
+# (true or false)
+#
+# This is false by default, because index names are often generated
+# using database design software which has the nasty habit of giving
+# non-helpful names to indexes as things like 'authors__b124214__u_idx'
+# instead of 'authors_title_idx'.
+UseIndexNames = false
+
+# UseReversedEnumConstNames toggles using whether to reverse enum names to
+# put the value before the type in the name.
+# (true or false)
+UseReversedEnumConstNames = false
+
+# NameConflictSuffix is the suffix used when a name conflicts with a scoped Go variable.
+NameConflictSuffix = "Val"
+
+# Tags are build tags to add to the generated Go files.
+# e.g. "linux,386 darwin,386"
+Tags = ""
+
+# Query sets a custom query to use to generate a custom type.
+# Use triple quotes on each side for multiple lines, e.g. """
+# If this is set then also set the QueryType.
+Query = ""
+
+# QueryType is the name to give to the Go type generated from the query.
+QueryType = ""
+
+# QueryFunc is the name to assign to the generated query func.
+QueryFunc = ""
+
+# QueryOnlyOne toggles the generated query code to expect only one result.
+# (true or false)
+QueryOnlyOne = false
+
+# QueryTrim enables triming whitespace on the supplied query.
+# (true or false)
+QueryTrim = false
+
+# QueryStrip enables stripping the '::<type> AS <name>' from supplied query.
+# (true or false)
+QueryStrip = false
+
+# QueryInterpolate enables interpolation in generated query.
+# (true or false)
+QueryInterpolate = false
+
+# TypeComment is the type comment for a query.
+QueryTypeComment = ""
+
+# FuncComment is the func comment to provide the named query.
+QueryFuncComment = ""
+
+# QueryParamDelimiter is the delimiter for parameterized values for a query.
+QueryParamDelimiter = "%%"
+
+# QueryFields sets a comma-separated stromg of field names to scan query's results
+# to the query's associated Go type
+# e.g. "field1, field2, field3"
+QueryFields = ""
+
+# QueryAllowNulls indicates that custom query results can contain null types.
+# (true or false)
+QueryAllowNulls = false
+
+# EscapeAll toggles escaping schema, table, and column names in SQL queries.
+# (true or false)
+EscapeAll = false
+
+# EscapeSchemaName toggles escaping schema name in SQL queries.
+# (true or false)
+EscapeSchemaName = false
+
+# EscapeTableNames toggles escaping table names in SQL queries.
+# (true or false)
+EscapeTableNames = false
+
+# EscapeColumnNames toggles escaping column names in SQL queries.
+# (true or false)
+EscapeColumnNames = false
