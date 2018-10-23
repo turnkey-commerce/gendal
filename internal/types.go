@@ -59,6 +59,7 @@ const (
 // EscType represents the different escape types.
 type EscType uint
 
+// Defines the names of the DB types that can be escaped.
 const (
 	SchemaEsc = iota
 	TableEsc

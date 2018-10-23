@@ -15,10 +15,11 @@ import (
 	"strings"
 
 	"github.com/alexflint/go-arg"
+	"github.com/spf13/viper"
 
-	"github.com/xo/dburl"
 	"github.com/turnkey-commerce/gendal/internal"
 	"github.com/turnkey-commerce/gendal/models"
+	"github.com/xo/dburl"
 
 	_ "github.com/turnkey-commerce/gendal/loaders"
 	_ "github.com/xo/xoutil"
@@ -43,7 +44,18 @@ func main() {
 	internal.Args = internal.NewDefaultArgs()
 	args := internal.Args
 
-	// parse args
+	// first look for settings in a gendal.toml config file
+	viper.SetConfigName("gendal")
+	viper.SetConfigType("toml")
+	viper.AddConfigPath("./...")
+	viper.ReadInConfig() // Find and read the config file
+	err = viper.Unmarshal(&args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "unable to decode into struct, %v", err)
+		os.Exit(1)
+	}
+
+	// parse args from command line
 	arg.MustParse(args)
 
 	// process args
@@ -99,6 +111,10 @@ func main() {
 // processArgs processs cli args.
 func processArgs(args *internal.ArgType) error {
 	var err error
+
+	if len(args.DSN) == 0 {
+		return errors.New("Database DSN must be provided")
+	}
 
 	// get working directory
 	cwd, err := os.Getwd()

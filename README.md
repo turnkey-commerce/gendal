@@ -92,11 +92,11 @@ $ go install ./mssqlmodels/
 
 ## Command Line Options
 
-The following are `gendal`'s command-line arguments and options:
+Following are `gendal`'s command-line arguments and options. These options can also be set using a [configuration file](#using-a-configuration-file).
 
 ```sh
 $ gendal --help
-usage: gendal [--verbose] [--schema SCHEMA] [--out OUT] [--append] [--suffix SUFFIX] [--single-file] [--package PACKAGE] [--custom-type-package CUSTOM-TYPE-PACKAGE] [--int32-type INT32-TYPE] [--uint32-type UINT32-TYPE] [--ignore-fields IGNORE-FIELDS] [--fk-mode FK-MODE] [--use-index-names] [--use-reversed-enum-const-names] [--query-mode] [--query QUERY] [--query-type QUERY-TYPE] [--query-func QUERY-FUNC] [--query-only-one] [--query-trim] [--query-strip] [--query-interpolate] [--query-type-comment QUERY-TYPE-COMMENT] [--query-func-comment QUERY-FUNC-COMMENT] [--query-delimiter QUERY-DELIMITER] [--query-fields QUERY-FIELDS] [--escape-all] [--escape-schema] [--escape-table] [--escape-column] [--enable-postgres-oids] [--name-conflict-suffix NAME-CONFLICT-SUFFIX] [--template-path TEMPLATE-PATH] DSN
+usage: gendal [--verbose] [--schema SCHEMA] [--out OUT] [--append] [--suffix SUFFIX] [--single-file] [--package PACKAGE] [--custom-type-package CUSTOM-TYPE-PACKAGE] [--int32-type INT32-TYPE] [--uint32-type UINT32-TYPE] [--ignore-fields IGNORE-FIELDS] [--ignore-tables IGNORE-TABLES] [--fk-mode FK-MODE] [--use-index-names] [--use-reversed-enum-const-names] [--query-mode] [--query QUERY] [--query-type QUERY-TYPE] [--query-func QUERY-FUNC] [--query-only-one] [--query-trim] [--query-strip] [--query-interpolate] [--query-type-comment QUERY-TYPE-COMMENT] [--query-func-comment QUERY-FUNC-COMMENT] [--query-delimiter QUERY-DELIMITER] [--query-fields QUERY-FIELDS] [--escape-all] [--escape-schema] [--escape-table] [--escape-column] [--enable-postgres-oids] [--name-conflict-suffix NAME-CONFLICT-SUFFIX] [--template-path TEMPLATE-PATH] DSN
 
 positional arguments:
   dsn                    data source name
@@ -120,6 +120,8 @@ options:
                          Go type to assign to unsigned integers [default: uint]
   --ignore-fields IGNORE-FIELDS
                          fields to exclude from the generated Go code types
+  --ignore-tables IGNORE-TABLES
+                         tables to exclude from the generated Go code types
   --fk-mode FK-MODE, -k FK-MODE
                          sets mode for naming foreign key funcs in generated Go code [values: <smart|parent|field|key>] [default: smart]
   --use-index-names, -j
@@ -158,6 +160,23 @@ options:
                          user supplied template path
   --help, -h             display this help and exit
 ```
+
+## Using a Configuration File
+
+A more consistent and repeatable way to run `gendal` throughout the life of a project is to use a configuration file.  A base configuration file called [gendal.toml](gendal.toml) is provided which uses the [TOML](https://github.com/toml-lang/toml) language for providing configurable access to all of the command line options.
+
+Follow these steps to use the configuration file:
+
+1) Copy the gendal.toml file from the gendal repository to the root directory of your project.
+2) Edit the `DSN` setting to point to the database for your project.
+3) Edit other settings according to the the needs of your project.
+4) Run gendal without needing to pass any command line flags.
+
+```sh
+$ gendal
+```
+
+If any command line options are passed then they will override the setting provided in the configuration file.
 
 ## About Base Templates
 
