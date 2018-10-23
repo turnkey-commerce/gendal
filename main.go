@@ -47,7 +47,7 @@ func main() {
 	// first look for settings in a gendal.toml config file
 	viper.SetConfigName("gendal")
 	viper.SetConfigType("toml")
-	viper.AddConfigPath("./...")
+	viper.AddConfigPath(".")
 	viper.ReadInConfig() // Find and read the config file
 	err = viper.Unmarshal(&args)
 	if err != nil {
