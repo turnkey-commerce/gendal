@@ -40,7 +40,7 @@ $ go get -u golang.org/x/tools/cmd/goimports
 Then, install in the usual Go way:
 
 ```sh
-$ go get -u github.com/
+$ go get -u github.com/turnkey-commerce/gendal
 
 # install with oracle support (see notes below)
 $ go get -tags oracle -u github.com/turnkey-commerce/gendal
