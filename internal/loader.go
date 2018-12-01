@@ -3,6 +3,8 @@ package internal
 import (
 	"errors"
 	"fmt"
+	"math/rand"
+	"strconv"
 	"strings"
 
 	"github.com/gedex/inflector"
@@ -648,8 +650,15 @@ func (tl TypeLoader) LoadTableForeignKeys(args *ArgType, tableMap map[string]*Ty
 			fk.ForeignKeyName = typeTpl.Table.TableName + "_" + col.Col.ColumnName + "_fkey"
 		}
 
+		// This random generated number is included in fkmap's key name as
+		// cockroachdb does not have database wide unique foreign key names
+		// so if two tables have same foreign key column name and reference
+		// same table the names are the same which get overridden in our
+		// fkmap variable
+		randNum := "_" + strconv.Itoa(rand.Int())
+
 		// create foreign key template
-		fkMap[fk.ForeignKeyName] = &ForeignKey{
+		fkMap[fk.ForeignKeyName+randNum] = &ForeignKey{
 			Schema:     args.Schema,
 			Type:       typeTpl,
 			Field:      col,
