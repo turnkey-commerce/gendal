@@ -134,3 +134,7 @@ EscapeTableNames = false
 # EscapeColumnNames toggles escaping column names in SQL queries.
 # (true or false)
 EscapeColumnNames = false
+
+# Sqlx adds foreign key relationship structs and query functions to generated types to
+# use with sqlx library
+Sqlx = false

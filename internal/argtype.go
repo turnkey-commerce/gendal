@@ -118,6 +118,10 @@ type ArgType struct {
 	// EnablePostgresOIDs toggles postgres oids.
 	EnablePostgresOIDs bool `arg:"--enable-postgres-oids,help:enable postgres oids"`
 
+	// Sqlx allows for user to optionally add foreign key structs to generated types
+	// so that users can query foreign key tables using the sqlx library
+	Sqlx bool `arg:"--sqlx,help:adds foreign key relationship structs and query functions to generated types to use with sqlx library"`
+
 	// NameConflictSuffix is the suffix used when a name conflicts with a scoped Go variable.
 	NameConflictSuffix string `arg:"--name-conflict-suffix,-w,help:suffix to append when a name conflicts with a Go variable"`
 

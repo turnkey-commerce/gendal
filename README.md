@@ -96,7 +96,7 @@ Following are `gendal`'s command-line arguments and options. These options can a
 
 ```sh
 $ gendal --help
-usage: gendal [--verbose] [--schema SCHEMA] [--out OUT] [--append] [--suffix SUFFIX] [--single-file] [--package PACKAGE] [--custom-type-package CUSTOM-TYPE-PACKAGE] [--int32-type INT32-TYPE] [--uint32-type UINT32-TYPE] [--ignore-fields IGNORE-FIELDS] [--ignore-tables IGNORE-TABLES] [--fk-mode FK-MODE] [--use-index-names] [--use-reversed-enum-const-names] [--query-mode] [--query QUERY] [--query-type QUERY-TYPE] [--query-func QUERY-FUNC] [--query-only-one] [--query-trim] [--query-strip] [--query-interpolate] [--query-type-comment QUERY-TYPE-COMMENT] [--query-func-comment QUERY-FUNC-COMMENT] [--query-delimiter QUERY-DELIMITER] [--query-fields QUERY-FIELDS] [--escape-all] [--escape-schema] [--escape-table] [--escape-column] [--enable-postgres-oids] [--name-conflict-suffix NAME-CONFLICT-SUFFIX] [--template-path TEMPLATE-PATH] DSN
+usage: gendal [--verbose] [--schema SCHEMA] [--out OUT] [--append] [--suffix SUFFIX] [--single-file] [--package PACKAGE] [--custom-type-package CUSTOM-TYPE-PACKAGE] [--int32-type INT32-TYPE] [--uint32-type UINT32-TYPE] [--ignore-fields IGNORE-FIELDS] [--ignore-tables IGNORE-TABLES] [--fk-mode FK-MODE] [--use-index-names] [--use-reversed-enum-const-names] [--query-mode] [--query QUERY] [--query-type QUERY-TYPE] [--query-func QUERY-FUNC] [--query-only-one] [--query-trim] [--query-strip] [--query-interpolate] [--query-type-comment QUERY-TYPE-COMMENT] [--query-func-comment QUERY-FUNC-COMMENT] [--query-delimiter QUERY-DELIMITER] [--query-fields QUERY-FIELDS] [--escape-all] [--escape-schema] [--escape-table] [--escape-column] [--enable-postgres-oids] [--name-conflict-suffix NAME-CONFLICT-SUFFIX] [--template-path TEMPLATE-PATH] [--sqlx] DSN
 
 positional arguments:
   dsn                    data source name
@@ -158,6 +158,7 @@ options:
                          suffix to append when a name conflicts with a Go variable [default: Val]
   --template-path TEMPLATE-PATH
                          user supplied template path
+  --sqlx                 adds foreign key relationship structs and query functions to generated types to use with sqlx library
   --help, -h             display this help and exit
 ```
 
