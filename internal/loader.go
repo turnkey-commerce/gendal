@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/knq/dburl"
+
 	"github.com/gedex/inflector"
 	"github.com/knq/snaker"
 
@@ -504,6 +506,26 @@ func (tl TypeLoader) LoadRelkind(args *ArgType, relType RelType) (map[string]*Ty
 
 	// generate table templates
 	for _, t := range tableMap {
+		t.Sqlx = args.Sqlx
+		// If args.Sqlx is true, get foreign keys for current table and add to our type
+		if args.Sqlx {
+			foreignKeyList, err := tl.ForeignKeyList(args.DB, args.Schema, t.Table.TableName)
+
+			if err != nil {
+				return nil, err
+			}
+
+			// Hack function used to get proper foreign keys from cockroachdb
+			foreignKeyList, err = tl.extractProperForeignKeys(foreignKeyList, args.DSN)
+
+			// Using GetTableForeignKeys to retrieve slice of internal#ForeignKey on per table basis
+			t.ForeignKeys, err = tl.GetTableForeignKeys(args, tableMap, t, nil, foreignKeyList)
+
+			if err != nil {
+				return nil, err
+			}
+		}
+
 		err = args.ExecuteTemplate(TypeTemplate, t.Name, "", t)
 		if err != nil {
 			return nil, err
@@ -603,69 +625,18 @@ func (tl TypeLoader) LoadTableForeignKeys(args *ArgType, tableMap map[string]*Ty
 		return err
 	}
 
-	// loop over foreign keys for table
-	for _, fk := range foreignKeyList {
-		var refTpl *Type
-		var col, refCol *Field
+	// Hack function used to get proper foreign keys from cockroachdb
+	foreignKeyList, err = tl.extractProperForeignKeys(foreignKeyList, args.DSN)
 
-	colLoop:
-		// find column
-		for _, f := range typeTpl.Fields {
-			if f.Col.ColumnName == fk.ColumnName {
-				col = f
-				break colLoop
-			}
-		}
+	if err != nil {
+		return err
+	}
 
-	refTplLoop:
-		// find ref table
-		for _, t := range tableMap {
-			if t.Table.TableName == fk.RefTableName {
-				refTpl = t
-				break refTplLoop
-			}
-		}
+	// Using GetTableForeignKeys here to modify fkmap to get all foreignkeys from database
+	_, err = tl.GetTableForeignKeys(args, tableMap, typeTpl, fkMap, foreignKeyList)
 
-	refColLoop:
-		// find ref column
-		for _, f := range refTpl.Fields {
-			if f.Col.ColumnName == fk.RefColumnName {
-				refCol = f
-				break refColLoop
-			}
-		}
-
-		// no ref col, but have ref tpl, so use primary key
-		if refTpl != nil && refCol == nil {
-			refCol = refTpl.PrimaryKey
-		}
-
-		// check everything was found
-		if col == nil || refTpl == nil || refCol == nil {
-			return errors.New("could not find col, refTpl, or refCol")
-		}
-
-		// foreign key name
-		if fk.ForeignKeyName == "" {
-			fk.ForeignKeyName = typeTpl.Table.TableName + "_" + col.Col.ColumnName + "_fkey"
-		}
-
-		// This random generated number is included in fkmap's key name as
-		// cockroachdb does not have database wide unique foreign key names
-		// so if two tables have same foreign key column name and reference
-		// same table the names are the same which get overridden in our
-		// fkmap variable
-		randNum := "_" + strconv.Itoa(rand.Int())
-
-		// create foreign key template
-		fkMap[fk.ForeignKeyName+randNum] = &ForeignKey{
-			Schema:     args.Schema,
-			Type:       typeTpl,
-			Field:      col,
-			RefType:    refTpl,
-			RefField:   refCol,
-			ForeignKey: fk,
-		}
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -794,4 +765,132 @@ func (tl TypeLoader) LoadIndexColumns(args *ArgType, ixTpl *Index) error {
 	}
 
 	return nil
+}
+
+// GetTableForeignKeys returns a slice of internal#ForeignKey based on the parameters passed
+// GetTableForeignKeys also modifies fkMap to add internal#ForeignKey to map
+// fkMap can be nil
+func (tl TypeLoader) GetTableForeignKeys(
+	args *ArgType,
+	tableMap map[string]*Type,
+	typeTpl *Type,
+	fkMap map[string]*ForeignKey,
+	foreignKeyList []*models.ForeignKey,
+) ([]*ForeignKey, error) {
+	foreignKeys := make([]*ForeignKey, 0)
+
+	// loop over foreign keys for table
+	for _, fk := range foreignKeyList {
+		var refTpl *Type
+		var col, refCol *Field
+
+	colLoop:
+		// find column
+		for _, f := range typeTpl.Fields {
+			if f.Col.ColumnName == fk.ColumnName {
+				col = f
+				break colLoop
+			}
+		}
+
+	refTplLoop:
+		// find ref table
+		for _, t := range tableMap {
+			if t.Table.TableName == fk.RefTableName {
+				refTpl = t
+				break refTplLoop
+			}
+		}
+
+	refColLoop:
+		// find ref column
+		for _, f := range refTpl.Fields {
+			if f.Col.ColumnName == fk.RefColumnName {
+				refCol = f
+				break refColLoop
+			}
+		}
+
+		// no ref col, but have ref tpl, so use primary key
+		if refTpl != nil && refCol == nil {
+			refCol = refTpl.PrimaryKey
+		}
+
+		// check everything was found
+		if col == nil || refTpl == nil || refCol == nil {
+			return nil, errors.New("could not find col, refTpl, or refCol")
+		}
+
+		// foreign key name
+		if fk.ForeignKeyName == "" {
+			fk.ForeignKeyName = typeTpl.Table.TableName + "_" + col.Col.ColumnName + "_fkey"
+		}
+
+		foreignKey := &ForeignKey{
+			Schema:     args.Schema,
+			Type:       typeTpl,
+			Field:      col,
+			RefType:    refTpl,
+			RefField:   refCol,
+			ForeignKey: fk,
+		}
+
+		if fkMap != nil {
+			// This random generated number is included in fkmap's key name as
+			// cockroachdb does not have database wide unique foreign key names
+			// so if two tables have same foreign key column name and reference
+			// same table the names are the same which get overridden in our
+			// fkmap variable
+			randNum := "_" + strconv.Itoa(rand.Int())
+
+			// fkMap is used for getting all foreign keys in database to be used for
+			// foreign key functions in *.foreignkey.go.tpl
+			fkMap[fk.ForeignKeyName+randNum] = foreignKey
+		}
+
+		// foreignKeys is used if args.Sqlx is set to true and returns foreign keys
+		// for one table at a time
+		foreignKeys = append(foreignKeys, foreignKey)
+	}
+
+	return foreignKeys, nil
+}
+
+// extractProperForeignKeys takes given models#ForeignKey slice and takes out foreign keys
+// that should not be in list
+// This is hack function for cockroachdb as cockroachdb adds foreignkeys that don't exist
+// when using the unique() function at database level
+func (tl TypeLoader) extractProperForeignKeys(fkList []*models.ForeignKey, dsn string) ([]*models.ForeignKey, error) {
+	url, err := dburl.Parse(dsn)
+
+	if err != nil {
+		return nil, err
+	}
+
+	isCockroachDB := false
+
+	if url.Unaliased == "cockroachdb" {
+		isCockroachDB = true
+	}
+
+	if isCockroachDB {
+		newForeignKeyList := make([]*models.ForeignKey, 0)
+
+		// This for loop is a "hack" to create new list of appropriate foreign keys references based on list passed
+		// If you use the unique() function in your database schema for two or more foreign key ids
+		// (most commonly used in a join table), the query used in the TypeLoader#ForeignKeyList function
+		// adds the unique constraint as a foreign key which causes duplicate variable names
+		// This only happens in cockroachdb which makes me believe that this might some type of
+		// bug with cockroachdb
+		// If a future commit fixes the query to get same result, we could get rid of this function
+		for i := range fkList {
+			if strings.Contains(fkList[i].ForeignKeyName, fkList[i].ColumnName) {
+				newForeignKeyList = append(newForeignKeyList, fkList[i])
+			}
+		}
+
+		return newForeignKeyList, nil
+	}
+
+	return fkList, nil
 }

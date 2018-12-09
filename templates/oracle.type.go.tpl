@@ -14,7 +14,40 @@ type {{ .Name }} struct {
 	// xo fields
 	_exists, _deleted bool
 {{ end }}
+{{- range .ForeignKeys }}
+	{{ foreignFieldName .Field.Name }}FK *{{ .RefType.Name }} `json:"{{ foreignDBName .Field.Col.ColumnName }}" db:"{{ foreignDBName .Field.Col.ColumnName }}"`
+{{- end }}
 }
+
+{{- if .Sqlx }}
+	// /////////////////////////////////////////////////////////////////////////
+	//         Helper functions for querying using the sqlx library
+	// /////////////////////////////////////////////////////////////////////////
+
+	func Query{{ .Name }}(q sqlx.Queryer, query string, args ...interface{}) (*{{ .Name }}, error) {
+		var dest {{.Name }}
+		err := sqlx.Get(q, &dest, query, args...)
+		return &dest, err
+	}
+
+	func Query{{ convertName .Name }}s(q sqlx.Queryer, query string, args ...interface{}) ([]*{{ .Name }}, error) {
+		var dest []*{{.Name }}
+		err := sqlx.Select(q, &dest, query, args...)
+		return dest, err
+	}
+
+	func Query{{ .Name }}WithCtx(ctx context.Context, q sqlx.QueryerContext, query string, args ...interface{}) (*{{ .Name }}, error) {
+		var dest {{.Name }}
+		err := sqlx.GetContext(ctx, q, &dest, query, args...)
+		return &dest, err
+	}
+
+	func Query{{ convertName .Name }}sWithCtx(ctx context.Context, q sqlx.QueryerContext, query string, args ...interface{}) ([]*{{ .Name }}, error) {
+		var dest []*{{.Name }}
+		err := sqlx.SelectContext(ctx, q, &dest, query, args...)
+		return dest, err
+	}
+{{- end }}
 
 {{ if .PrimaryKey }}
 // Exists determines if the {{ .Name }} exists in the database.

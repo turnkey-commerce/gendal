@@ -33,6 +33,30 @@ func (a *ArgType) NewTemplateFuncs() template.FuncMap {
 		"hascolumn":          a.hascolumn,
 		"hasfield":           a.hasfield,
 		"getstartcount":      a.getstartcount,
+		"foreignDBName":      a.foreignDBName,
+		"foreignFieldName":   a.foreignFieldName,
+		"convertName":        a.convertName,
+	}
+}
+
+func (a *ArgType) foreignFieldName(col string) string {
+	return (col[:len(col)-2])
+}
+
+func (a *ArgType) foreignDBName(col string) string {
+	return col[:len(col)-3]
+}
+
+func (a *ArgType) convertName(name string) string {
+	lastLetter := name[len(name)-1:]
+
+	switch lastLetter {
+	case "y":
+		return name[:len(name)-1] + "ie"
+	case "s":
+		return name[:len(name)-1] + "se"
+	default:
+		return name
 	}
 }
 
