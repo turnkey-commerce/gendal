@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/knq/dburl"
+	"github.com/xo/dburl"
 
 	"github.com/gedex/inflector"
 	"github.com/knq/snaker"
