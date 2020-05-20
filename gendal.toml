@@ -138,3 +138,8 @@ EscapeColumnNames = false
 # Sqlx adds foreign key relationship structs and query functions to generated types to
 # use with sqlx library
 Sqlx = false
+
+# PgtypeMode changes the types in the generate code to use types from the `pgtype`
+# module rather than the default types from the `sql/database` module.
+# (0 for std, 1 for pgtype-full, 2 for pointer, 3 for pgtype)
+PgtypeMode = 0
