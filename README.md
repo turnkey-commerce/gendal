@@ -314,6 +314,31 @@ Alternatively, you can simply do the following:
 $ go generate && go build
 ```
 
+## Customizing Generated Types
+It is possible to override the types in the generated code by adding a section
+called `TypeOverrides` in `gendal.toml`. This bypasses all the type generation
+logic and simply maps the database types with the custom go type. To customize
+a type, add a table to the `TypeOverrides` array in the configuration file:
+```toml
+[[TypeOverrides]]
+DatabaseType = "database type name"
+Type_ = "go_type"
+NilValue = "go_nil_value"
+NullableType = "nullable_go_type"
+NullableNilValue = "nullable_go_nil_value"
+```
+Where:
+* `database_type_name` is the SQL type name (case insensitive);
+* `go_type` is the go type name when the SQL type is declared with a `NON NULL`
+constraint;
+* `go_nil_value` is an expression declaring a default value of that type;
+* `nullable_go_type` is the go type name when the SQL type is declared
+_without_ a `NON NULL` constraint;
+* `nullable_go_nil_value` is an expression declaring a default `nil` value of that
+type;
+
+> This function is only available using the configuration file.
+
 ## Examples
 
 ### Example: End-to-End
@@ -455,6 +480,72 @@ for _, user := range users {
     log.Printf("got user: %+v", user)
 }
 ```
+
+### Example: Overriding Types
+Overriding types gives the developer full control over the go types
+generated from a database schema.
+
+For example, the `--int32-type` flag allows to override the go type for 32 bits
+integer to any type from the default `int`. However, with PostgreSQL for
+instance, if an `INTEGER` column does not have a `NOT NULL` constraint. The
+resulting go type will be `sql.NullINt64`.
+
+Overriding types allows to fully map a 32 bits integer to a specific go
+type. In the example above a PostgreSQL `INTEGER` could be mapped to `int32`
+and `*int32` for columns without a `NOT NULL` constraint.
+
+Overriding types also allows the mapping of complex (and/or custom)
+database types to custom go types, such as custom structs.
+
+As a practical example, `SMALLINT` could be using a pointer for nullable
+values:
+```toml
+[[TypeOverrides]]
+DatabaseType = "SMALLINT"
+Type_ = "int16"
+NilValue = "0"
+NullableType = "*int16"
+NullableNilValue = "nil"
+```
+
+To us a go `string` and `*string` (with `NULL` values) for PostgreSQL's `TEXT`,
+one can define:
+
+```toml
+[[TypeOverrides]]
+DatabaseType = "TEXT"
+Type_ = "string"
+NilValue = '""'
+NullableType = "*string"
+NullableNilValue = "nil"
+```
+
+> Note that the `NilValue` is `'""'` and not just `""`, as it is an
+> *expression*. Thus `'""'` will result in a go empty string literal (`""`),
+> while an actual empty string in the config file would result in *nothing* in
+> the generated go code.
+
+Array types can also be overriden. For example to take advantage of `pgtype`'s
+array types. For example:
+
+```toml
+[[TypeOverrides]]
+DatabaseType = "TIMESTAMP WITH TIME ZONE[]"
+Type_ = "pgtype.TimestamptzArray"
+NilValue = "pgtype.TimestamptzArray{}"
+NullableType = "pgtype.TimestamptzArray"
+NullableNilValue = "pgtype.TimestamptzArray{}"
+
+[[TypeOverrides]]
+DatabaseType = "TIMESTAMP WITHOUT TIME ZONE[]"
+Type_ = "pgtype.TimestampArray"
+NilValue = "pgtype.TimestampArray{}"
+NullableType = "pgtype.TimestampArray"
+NullableNilValue = "pgtype.TimestampArray{}"
+```
+
+will use `pgtype.TimestamptzArray{}`/`pgtype.TimestampArray{}` for an array of
+timestamp rather than a slice of `pgtype.Timestamptz`/`pgtype.Timestamp`.
 
 ## Using SQL Drivers
 

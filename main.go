@@ -225,6 +225,11 @@ func processArgs(args *internal.ArgType) error {
 		}
 	}
 
+	err = args.PopulateInternalTypeOverrides()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

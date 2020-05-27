@@ -20,7 +20,7 @@ func init() {
 		MaskFunc:       func() string { return ":%d" },
 		ProcessRelkind: OrRelkind,
 		Schema:         OrSchema,
-		ParseType:      OrParseType,
+		ParseTypeFunc:  OrParseType,
 		//EnumList:        models.OrEnums,
 		//EnumValueList:   OrEnumValues,
 		//ProcList:      models.OrProcs,

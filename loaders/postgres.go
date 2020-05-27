@@ -18,7 +18,7 @@ func init() {
 	internal.SchemaLoaders["postgres"] = internal.TypeLoader{
 		ProcessRelkind: PgRelkind,
 		Schema:         func(*internal.ArgType) (string, error) { return "public", nil },
-		ParseType:      PgParseType,
+		ParseTypeFunc:  PgParseType,
 		EnumList:       models.PgEnums,
 		EnumValueList:  models.PgEnumValues,
 		ProcList:       PgProcs,
