@@ -445,7 +445,7 @@ func (tl TypeLoader) LoadProcParams(args *ArgType, procTpl *Proc) error {
 			Name: fmt.Sprintf("v%d", i),
 		}
 
-		_, _, paramTpl.Type = tl.ParseType(args, strings.TrimSpace(p.ParamType), true)
+		_, _, paramTpl.Type = tl.ParseType(args, strings.TrimSpace(p.ParamType), args.NullableProcParams)
 
 		// add to proc params
 		if procTpl.ProcParams != "" {
