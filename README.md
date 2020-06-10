@@ -159,6 +159,7 @@ options:
   --template-path TEMPLATE-PATH
                          user supplied template path
   --sqlx                 adds foreign key relationship structs and query functions to generated types to use with sqlx library
+  --pg-type PG-TYPE      Use types from the pgtype module. This gives better compatibility for the pgx driver for postgres. [values: <std|pointer|pgtype|pgtype-full>] [default: std]
   --help, -h             display this help and exit
 ```
 
@@ -576,6 +577,29 @@ And when opening a database connection:
 ```go
 db, err := dburl.Open("file:mydatabase.sqlite3?loc=auto")
 ```
+
+### About the `pgx` Driver for Postgres and the `pg-type` Flag
+
+As for the other drivers, `gendal` does not import or use them. However, `pgx`
+is a special case as it will perform better or have more features using the
+types from the `pgtype` module. To use `pgx` to its fullest, the `pg-type`
+argument lets `gendal` know to generate code that uses those types instead of
+the default ones.
+
+The supported modes for the `pg-type` flag are:
+* `std` is the default mode. It will generate code using the types
+from the `sql/database` module.
+* `pgtype-full` will generate code using types from the `pgtype` module
+for every fields and arguments. This mode lets `pgx` use `pgtype` to
+its fullest but the models can look a bit less clean as each field is
+a wrapped type.
+* `pointer` will generate code using the types internal to the
+`pgtype` structures. For nullable fields and arguments, this type will
+be a pointer to that type. If the internal type of the struct cannot be
+used because the struct contains several fields, the equivalent from
+the `std` mode is used instead.
+* `pgtype` is the same as `pointer` except that it will use the `pgtype`
+structures for nullable fields and arguments rather than pointers.
 
 ## About Primary Keys
 For row inserts `gendal` determines whether the primary key is

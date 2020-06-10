@@ -53,7 +53,6 @@ func PgRelkind(relType internal.RelType) string {
 // definition.
 func PgParseType(args *internal.ArgType, dt string, nullable bool) (int, string, string) {
 	precision := 0
-	nilVal := "nil"
 	asSlice := false
 
 	// handle SETOF
@@ -71,121 +70,15 @@ func PgParseType(args *internal.ArgType, dt string, nullable bool) (int, string,
 	// extract precision
 	dt, precision, _ = args.ParsePrecision(dt)
 
-	var typ string
-	switch dt {
-	case "boolean":
-		nilVal = "false"
-		typ = "bool"
-		if nullable {
-			nilVal = "sql.NullBool{}"
-			typ = "sql.NullBool"
-		}
+	typ, nilVal, ok := args.PgtypeMode.PostgresNameToPgtypeName(
+		dt,
+		nullable,
+		&asSlice,
+		args.Int32Type,
+		args.Uint32Type,
+	)
 
-	case "character", "character varying", "text", "money", "inet":
-		nilVal = `""`
-		typ = "string"
-		if nullable {
-			nilVal = "sql.NullString{}"
-			typ = "sql.NullString"
-		}
-
-	case "smallint":
-		nilVal = "0"
-		typ = "int16"
-		if nullable {
-			nilVal = "sql.NullInt64{}"
-			typ = "sql.NullInt64"
-		}
-	case "integer":
-		nilVal = "0"
-		typ = args.Int32Type
-		if nullable {
-			nilVal = "sql.NullInt64{}"
-			typ = "sql.NullInt64"
-		}
-	case "bigint":
-		nilVal = "0"
-		typ = "int64"
-		if nullable {
-			nilVal = "sql.NullInt64{}"
-			typ = "sql.NullInt64"
-		}
-
-	case "smallserial":
-		nilVal = "0"
-		typ = "uint16"
-		if nullable {
-			nilVal = "sql.NullInt64{}"
-			typ = "sql.NullInt64"
-		}
-	case "serial":
-		nilVal = "0"
-		typ = args.Uint32Type
-		if nullable {
-			nilVal = "sql.NullInt64{}"
-			typ = "sql.NullInt64"
-		}
-	case "bigserial":
-		nilVal = "0"
-		typ = "uint64"
-		if nullable {
-			nilVal = "sql.NullInt64{}"
-			typ = "sql.NullInt64"
-		}
-
-	case "real":
-		nilVal = "0.0"
-		typ = "float32"
-		if nullable {
-			nilVal = "sql.NullFloat64{}"
-			typ = "sql.NullFloat64"
-		}
-	case "numeric", "double precision":
-		nilVal = "0.0"
-		typ = "float64"
-		if nullable {
-			nilVal = "sql.NullFloat64{}"
-			typ = "sql.NullFloat64"
-		}
-
-	case "bytea":
-		asSlice = true
-		typ = "byte"
-
-	case "date", "timestamp with time zone", "time with time zone", "time without time zone", "timestamp without time zone":
-		nilVal = "time.Time{}"
-		typ = "time.Time"
-		if nullable {
-			nilVal = "pq.NullTime{}"
-			typ = "pq.NullTime"
-		}
-
-	case "interval":
-		typ = "*time.Duration"
-
-	case `"char"`, "bit":
-		// FIXME: this needs to actually be tested ...
-		// i think this should be 'rune' but I don't think database/sql
-		// supports 'rune' as a type?
-		//
-		// this is mainly here because postgres's pg_catalog.* meta tables have
-		// this as a type.
-		//typ = "rune"
-		nilVal = `uint8(0)`
-		typ = "uint8"
-
-	case `"any"`, "bit varying":
-		asSlice = true
-		typ = "byte"
-
-	case "hstore":
-		typ = "hstore.Hstore"
-
-	case "uuid":
-		nilVal = "uuid.New()"
-		typ = "uuid.UUID"
-
-	default:
+	if !ok {
 		if strings.HasPrefix(dt, args.Schema+".") {
 			// in the same schema, so chop off
 			typ = snaker.SnakeToCamelIdentifier(dt[len(args.Schema)+1:])

@@ -1,6 +1,9 @@
 package internal
 
-import "database/sql"
+import (
+	"database/sql"
+	"github.com/turnkey-commerce/gendal/loaders/postgrestypes"
+)
 
 // ArgType is the type that specifies the command line arguments.
 type ArgType struct {
@@ -122,6 +125,8 @@ type ArgType struct {
 	// so that users can query foreign key tables using the sqlx library
 	Sqlx bool `arg:"--sqlx,help:adds foreign key relationship structs and query functions to generated types to use with sqlx library"`
 
+	PgtypeMode *postgrestypes.PgtypeMode `arg:"--pg-type,help:Use types from the pgtype module. This gives better compatibility for the pgx driver for postgres. [values: <std|pgtype-full|pointer|pgtype>]"`
+
 	// NameConflictSuffix is the suffix used when a name conflicts with a scoped Go variable.
 	NameConflictSuffix string `arg:"--name-conflict-suffix,-w,help:suffix to append when a name conflicts with a Go variable"`
 
@@ -164,6 +169,7 @@ type ArgType struct {
 // NewDefaultArgs returns the default arguments.
 func NewDefaultArgs() *ArgType {
 	fkMode := FkModeSmart
+	pgtypeMode := postgrestypes.PgtypeModeStd
 
 	return &ArgType{
 		Suffix:              ".xo.go",
@@ -172,6 +178,7 @@ func NewDefaultArgs() *ArgType {
 		ForeignKeyMode:      &fkMode,
 		QueryParamDelimiter: "%%",
 		NameConflictSuffix:  "Val",
+		PgtypeMode:          &pgtypeMode,
 
 		// KnownTypeMap is the collection of known Go types.
 		KnownTypeMap: map[string]bool{
