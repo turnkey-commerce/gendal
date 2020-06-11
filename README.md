@@ -160,6 +160,7 @@ options:
                          user supplied template path
   --sqlx                 adds foreign key relationship structs and query functions to generated types to use with sqlx library
   --pg-type PG-TYPE      Use types from the pgtype module. This gives better compatibility for the pgx driver for postgres. [values: <std|pointer|pgtype|pgtype-full>] [default: std]
+  --nullable-proc-params Toggles nullable types for stored procedure parameters.
   --help, -h             display this help and exit
 ```
 

@@ -164,6 +164,9 @@ type ArgType struct {
 	// ShortNameTypeMap is the collection of Go style short names for types, mainly
 	// used for use with declaring a func receiver on a type.
 	ShortNameTypeMap map[string]string `arg:"-"`
+
+	// NullableProcParams toggle nullable types for stored procedure parameters.
+	NullableProcParams bool `arg:"--nullable-proc-params"`
 }
 
 // NewDefaultArgs returns the default arguments.
