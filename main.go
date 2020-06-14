@@ -48,7 +48,15 @@ func main() {
 	viper.SetConfigName("gendal")
 	viper.SetConfigType("toml")
 	viper.AddConfigPath(".")
-	viper.ReadInConfig() // Find and read the config file
+
+	// Find and read the config file
+	err = viper.ReadInConfig()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "unable to read the config file, %v", err)
+		os.Exit(1)
+	}
+
+	// Decode config file to the args.
 	err = viper.Unmarshal(&args)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "unable to decode into struct, %v", err)
