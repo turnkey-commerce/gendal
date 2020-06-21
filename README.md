@@ -508,7 +508,7 @@ NullableType = "*int16"
 NullableNilValue = "nil"
 ```
 
-To us a go `string` and `*string` (with `NULL` values) for PostgreSQL's `TEXT`,
+To use a go `string` and `*string` (with `NULL` values) for PostgreSQL's `TEXT`,
 one can define:
 
 ```toml
