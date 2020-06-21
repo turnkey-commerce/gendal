@@ -53,7 +53,7 @@ type TypeLoader struct {
 	Esc             map[EscType]func(string) string
 	ProcessRelkind  func(RelType) string
 	Schema          func(*ArgType) (string, error)
-	ParseType       func(*ArgType, string, bool) (int, string, string)
+	ParseTypeFunc   func(*ArgType, string, bool) (int, string, string)
 	EnumList        func(models.XODB, string) ([]*models.Enum, error)
 	EnumValueList   func(models.XODB, string, string) ([]*models.EnumValue, error)
 	ProcList        func(models.XODB, string) ([]*models.Proc, error)
@@ -65,6 +65,17 @@ type TypeLoader struct {
 	IndexColumnList func(models.XODB, string, string, string) ([]*models.IndexColumn, error)
 	QueryStrip      func([]string, []string)
 	QueryColumnList func(*ArgType, []string) ([]*models.Column, error)
+}
+
+func (tl TypeLoader) ParseType(args *ArgType, dt string, nullable bool) (int, string, string) {
+	if entry, ok := args.internalTypeOverrides[dt]; ok {
+		if nullable {
+			return -1, entry.NullableNilValue, entry.NullableType
+		} else {
+			return -1, entry.NilValue, entry.Type_
+		}
+	}
+	return tl.ParseTypeFunc(args, dt, nullable)
 }
 
 // NthParam satisifies Loader's NthParam.

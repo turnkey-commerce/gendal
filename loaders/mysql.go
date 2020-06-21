@@ -17,7 +17,7 @@ func init() {
 		MaskFunc:        func() string { return "?" },
 		ProcessRelkind:  MyRelkind,
 		Schema:          MySchema,
-		ParseType:       MyParseType,
+		ParseTypeFunc:   MyParseType,
 		EnumList:        models.MyEnums,
 		EnumValueList:   MyEnumValues,
 		ProcList:        models.MyProcs,

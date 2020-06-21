@@ -15,7 +15,7 @@ func init() {
 		ProcessRelkind: SqRelkind,
 		ParamN:         func(int) string { return "?" },
 		MaskFunc:       func() string { return "?" },
-		ParseType:      SqParseType,
+		ParseTypeFunc:  SqParseType,
 		TableList:      SqTables,
 		ColumnList:     SqTableColumns,
 		ForeignKeyList: func(db models.XODB, schema string, table string) ([]*models.ForeignKey, error) {

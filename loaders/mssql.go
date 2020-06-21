@@ -16,7 +16,7 @@ func init() {
 		MaskFunc:       func() string { return "$%d" },
 		ProcessRelkind: MsRelkind,
 		Schema:         MsSchema,
-		ParseType:      MsParseType,
+		ParseTypeFunc:  MsParseType,
 		//EnumList:       models.MsEnums,
 		//EnumValueList:  models.MsEnumValues,
 		//ProcList:       models.MsProcs,
