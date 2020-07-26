@@ -54,7 +54,7 @@ func BaseSchemes() []Scheme {
 		// core databases
 		{"mssql", GenSQLServer, 0, false, []string{"sqlserver"}, ""},
 		{"mysql", GenMySQL, ProtoTCP | ProtoUDP | ProtoUnix, false, []string{"mariadb", "maria", "percona", "aurora"}, ""},
-		{"ora", GenOracle, 0, false, []string{"oracle", "oci8", "oci"}, ""},
+		{"godror", GenOracle, 0, false, []string{"or", "ora", "oracle", "oci", "oci8", "odpi", "odpi-c"}, ""},
 		{"postgres", GenPostgres, ProtoUnix, false, []string{"pg", "postgresql", "pgsql"}, ""},
 		{"sqlite3", GenOpaque, 0, true, []string{"sqlite", "file"}, ""},
 
@@ -68,15 +68,15 @@ func BaseSchemes() []Scheme {
 		// testing
 		{"spanner", GenScheme("spanner"), 0, false, []string{"gs", "google", "span"}, ""},
 
-		// alternates implementations
+		// alternate implementations
 		{"mymysql", GenMyMySQL, ProtoTCP | ProtoUDP | ProtoUnix, false, []string{"zm", "mymy"}, ""},
 		{"pgx", GenScheme("postgres"), ProtoUnix, false, []string{"px"}, ""},
 
 		// other databases
 		{"adodb", GenADODB, 0, false, []string{"ado"}, ""},
 		{"avatica", GenFromURL("http://localhost:8765/"), 0, false, []string{"phoenix"}, ""},
-		{"cql", GenCassandra, 0, false, []string{"ca", "cassandra", "datastax", "scy", "scylla"}, ""},
 		{"clickhouse", GenClickhouse, 0, false, []string{"ch"}, ""},
+		{"cql", GenCassandra, 0, false, []string{"ca", "cassandra", "datastax", "scy", "scylla"}, ""},
 		{"firebirdsql", GenFirebird, 0, false, []string{"fb", "firebird"}, ""},
 		{"hdb", GenScheme("hdb"), 0, false, []string{"sa", "saphana", "sap", "hana"}, ""},
 		{"ignite", GenIgnite, 0, false, []string{"ig", "gridgain"}, ""},
@@ -86,6 +86,8 @@ func BaseSchemes() []Scheme {
 		{"presto", GenPresto, 0, false, []string{"prestodb", "prestos", "prs", "prestodbs"}, ""},
 		{"ql", GenOpaque, 0, true, []string{"ql", "cznic", "cznicql"}, ""},
 		{"snowflake", GenSnowflake, 0, false, []string{"sf"}, ""},
+		{"tds", GenFromURL("http://localhost:5000/"), 0, false, []string{"ax", "ase", "sapase"}, ""},
+		{"vertica", GenFromURL("vertica://localhost:5433/"), 0, false, nil, ""},
 		{"voltdb", GenVoltDB, 0, false, []string{"volt", "vdb"}, ""},
 	}
 }

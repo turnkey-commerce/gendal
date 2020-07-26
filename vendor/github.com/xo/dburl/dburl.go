@@ -1,9 +1,12 @@
 // Package dburl provides a standard, URL style mechanism for parsing and
-// opening SQL database connection strings.
+// opening SQL database connection strings for Go. Provides standardized way to
+// parse and open URLs for popular databases PostgreSQL, MySQL, SQLite3, Oracle
+// Database, Microsoft SQL Server, in addition to most other SQL databases with
+// a publicly available Go driver.
 //
-// Database URL Connection Strings
+// Database Connection URL Overview
 //
-// Supported database URLs are of the form:
+// Supported database connection URLs are of the form:
 //
 //   protocol+transport://user:pass@host/dbname?opt1=a&opt2=b
 //   protocol:/path/to/file
@@ -19,26 +22,34 @@
 //   ?opt1=... - additional database driver options
 //                 (see respective SQL driver for available options)
 //
-// * for Microsoft SQL Server, the syntax to supply an instance and database
-// name is /instance/dbname, where /instance is optional. For Oracle databases,
-// /dbname is the unique database ID (SID). Please see below for examples.
+// * for Microsoft SQL Server, /dbname can be /instance/dbname, where /instance
+// is optional. For Oracle Database, /dbname is of the form /service/dbname
+// where /service is the service name or SID, and /dbname is optional. Please
+// see below for examples.
 //
 // Quickstart
 //
-// URLs in the above format can be parsed with Parse as such:
+// Database connection URLs in the above format can be parsed with Parse as such:
 //
+//   import (
+//       "github.com/xo/dburl"
+//   )
 //   u, err := dburl.Parse("postgresql://user:pass@localhost/mydatabase/?sslmode=disable")
 //   if err != nil { /* ... */ }
 //
-// Additionally, a simple helper func, Open, is available to quickly parse,
-// open, and return a standard SQL database connection:
+// Additionally, a simple helper, Open, is provided that will parse, open, and
+// return a standard sql.DB database connection:
 //
+//   import (
+//       "github.com/xo/dburl"
+//   )
 //   db, err := dburl.Open("sqlite:mydatabase.sqlite3?loc=auto")
 //   if err != nil { /* ... */ }
 //
 // Example URLs
 //
-// The following are URLs that can be handled with a call to Open or Parse:
+// The following are example database connection URLs that can be handled by
+// Parse and Open:
 //
 //   postgres://user:pass@localhost/dbname
 //   pg://user:pass@localhost/dbname?sslmode=disable
@@ -47,7 +58,7 @@
 //   sqlserver://user:pass@remote-host.com/dbname
 //   mssql://user:pass@remote-host.com/instance/dbname
 //   ms://user:pass@remote-host.com:port/instance/dbname?keepAlive=10
-//   oracle://user:pass@somehost.com/oracledb
+//   oracle://user:pass@somehost.com/sid
 //   sap://user:pass@localhost/dbname
 //   sqlite:/path/to/file.db
 //   file:myfile.sqlite3?loc=auto
@@ -59,24 +70,24 @@
 // are supported out of the box:
 //
 //   Database (scheme/driver)     | Protocol Aliases [real driver]
-//   -----------------------------|-------------------------------------------
+//   -----------------------------|--------------------------------------------
 //   Microsoft SQL Server (mssql) | ms, sqlserver
 //   MySQL (mysql)                | my, mariadb, maria, percona, aurora
-//   Oracle (ora)                 | or, oracle, oci8, oci
+//   Oracle Database (godror)     | or, ora, oci, oci8, odpi, odpi-c
 //   PostgreSQL (postgres)        | pg, postgresql, pgsql
 //   SQLite3 (sqlite3)            | sq, sqlite, file
-//   -----------------------------|-------------------------------------------
+//   -----------------------------|--------------------------------------------
 //   Amazon Redshift (redshift)   | rs [postgres]
 //   CockroachDB (cockroachdb)    | cr, cockroach, crdb, cdb [postgres]
 //   MemSQL (memsql)              | me [mysql]
 //   TiDB (tidb)                  | ti [mysql]
 //   Vitess (vitess)              | vt [mysql]
-//   -----------------------------|-------------------------------------------
+//   -----------------------------|--------------------------------------------
 //   Google Spanner (spanner)     | gs, google, span (not yet public)
-//   -----------------------------|-------------------------------------------
+//   -----------------------------|--------------------------------------------
 //   MySQL (mymysql)              | zm, mymy
 //   PostgreSQL (pgx)             | px
-//   -----------------------------|-------------------------------------------
+//   -----------------------------|--------------------------------------------
 //   Apache Avatica (avatica)     | av, phoenix
 //   Apache Ignite (ignite)       | ig, gridgain
 //   Cassandra (cql)              | ca, cassandra, datastax, scy, scylla
@@ -88,14 +99,16 @@
 //   ODBC (odbc)                  | od
 //   OLE ODBC (oleodbc)           | oo, ole, oleodbc [adodb]
 //   Presto (presto)              | pr, prestodb, prestos, prs, prestodbs
+//   SAP ASE (tds)                | ax, ase, sapase
 //   SAP HANA (hdb)               | sa, saphana, sap, hana
 //   Snowflake (snowflake)        | sf
+//   Vertica (vertica)            | ve
 //   VoltDB (voltdb)              | vo, volt, vdb
 //
 // Any protocol scheme alias:// can be used in place of protocol://, and will
-// work identically with Parse/Open.
+// work identically with Parse and Open.
 //
-// Usage
+// Using
 //
 // Please note that the dburl package does not import actual SQL drivers, and
 // only provides a standard way to parse/open respective database connection URLs.
@@ -107,7 +120,7 @@
 //   -----------------------------|-------------------------------------------------
 //   Microsoft SQL Server (mssql) | github.com/denisenkom/go-mssqldb
 //   MySQL (mysql)                | github.com/go-sql-driver/mysql
-//   Oracle (ora)                 | gopkg.in/rana/ora.v4
+//   Oracle Database (godror)     | github.com/godror/godror
 //   PostgreSQL (postgres)        | github.com/lib/pq
 //   SQLite3 (sqlite3)            | github.com/mattn/go-sqlite3
 //   -----------------------------|-------------------------------------------------
@@ -125,26 +138,27 @@
 //   Apache Avatica (avatica)     | github.com/Boostport/avatica
 //   Apache Ignite (ignite)       | github.com/amsokol/ignite-go-client/sql
 //   Cassandra (cql)              | github.com/MichaelS11/go-cql-driver
-//   ClickHouse (clickhouse)      | github.com/kshvakov/clickhouse
+//   ClickHouse (clickhouse)      | github.com/ClickHouse/clickhouse-go
 //   Couchbase (n1ql)             | github.com/couchbase/go_n1ql
-//   Cznic QL (ql)                | github.com/cznic/ql
+//   Cznic QL (ql)                | modernc.org/ql
 //   Firebird SQL (firebirdsql)   | github.com/nakagami/firebirdsql
 //   Microsoft ADODB (adodb)      | github.com/mattn/go-adodb
 //   ODBC (odbc)                  | github.com/alexbrainman/odbc
 //   OLE ODBC (oleodbc)*          | github.com/mattn/go-adodb
 //   Presto (presto)              | github.com/prestodb/presto-go-client
+//   SAP ASE (tds)                | github.com/thda/tds
 //   SAP HANA (hdb)               | github.com/SAP/go-hdb/driver
 //   Snowflake (snowflake)        | github.com/snowflakedb/gosnowflake
+//   Vertica (vertica)            | github.com/vertica/vertica-sql-go
 //   VoltDB (voltdb)              | github.com/VoltDB/voltdb-client-go/voltdbclient
 //
-// * OLE ODBC is not an actual protocol, but instead is an alias for using the
-//   "MSDASQL.1" OLE provider with the ADODB driver, and the DSN will be an
-//   ADODB DSN, but with "Extended Properties" for the respective ODBC
-//   parameters, including the underlying transport prootocol. As such,
-//   "oleodbc+protocol://user:pass@host/dbname" URLs are equivalent to
-//   "adodb://MSDASQL.1/?Extended+Properties=...". Please see the
-//   documentation for GenOLEODBC for information regarding how URL components
-//   are mapped/passed to ADODB's Extended Properties parameter.
+// * OLE ODBC is a special alias for using the "MSDASQL.1" OLE provider with the
+// ADODB driver on Windows. oleodbc:// URLs will be converted to the equivalent
+// ADODB DSN with "Extended Properties" having the respective ODBC parameters,
+// including the underlying transport prootocol. As such, oleodbc+protocol://user:pass@host/dbname
+// URLs are equivalent to adodb://MSDASQL.1/?Extended+Properties=.... on
+// Windows. See GenOLEODBC for information regarding how URL components are
+// mapped and passed to ADODB's Extended Properties parameter.
 //
 // URL Parsing Rules
 //
@@ -188,6 +202,9 @@ const (
 
 	// ErrMissingPath is the missing path error.
 	ErrMissingPath Error = "missing path"
+
+	// ErrMissingUser is the missing user error.
+	ErrMissingUser Error = "missing user"
 )
 
 // Open takes a urlstr like "protocol+transport://user:pass@host/dbname?option1=a&option2=b"
