@@ -16,17 +16,15 @@ import (
 
 func init() {
 	internal.SchemaLoaders["postgres"] = internal.TypeLoader{
-		ProcessRelkind: PgRelkind,
-		Schema:         func(*internal.ArgType) (string, error) { return "public", nil },
-		ParseTypeFunc:  PgParseType,
-		EnumList:       models.PgEnums,
-		EnumValueList:  models.PgEnumValues,
-		ProcList:       PgProcs,
-		ProcParamList:  models.PgProcParams,
-		TableList:      PgTables,
-		ColumnList: func(db models.XODB, schema string, table string) ([]*models.Column, error) {
-			return models.PgTableColumns(db, schema, table, internal.Args.EnablePostgresOIDs)
-		},
+		ProcessRelkind:  PgRelkind,
+		Schema:          func(*internal.ArgType) (string, error) { return "public", nil },
+		ParseTypeFunc:   PgParseType,
+		EnumList:        models.PgEnums,
+		EnumValueList:   models.PgEnumValues,
+		ProcList:        PgProcs,
+		ProcParamList:   models.PgProcParams,
+		TableList:       PgTables,
+		ColumnList:      PgTableColumns,
 		ForeignKeyList:  models.PgTableForeignKeys,
 		IndexList:       models.PgTableIndexes,
 		IndexColumnList: PgIndexColumns,
@@ -285,4 +283,23 @@ func PgIndexColumns(db models.XODB, schema string, table string, index string) (
 	}
 
 	return ret, nil
+}
+
+func PgTableColumns(db models.XODB, schema string, table string) ([]*models.Column, error) {
+	cols, err := models.PgTableColumns(db, schema, table, internal.Args.EnablePostgresOIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	if !internal.Args.EnablePostgresJson {
+		return cols, nil
+	}
+
+	for _, col := range cols {
+		if col.DataType == "json" || col.DataType == "jsonb" {
+			col.DataType = col.ColumnName
+		}
+	}
+
+	return cols, nil
 }
