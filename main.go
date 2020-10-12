@@ -25,6 +25,11 @@ import (
 	_ "github.com/xo/xoutil"
 )
 
+var (
+	// Version is the Semver version of the application.
+	version = "1.2.6"
+)
+
 func main() {
 	// circumvent all logic to just determine if xo was built with oracle
 	// support
@@ -41,7 +46,7 @@ func main() {
 	var err error
 
 	// get defaults
-	internal.Args = internal.NewDefaultArgs()
+	internal.Args = internal.NewDefaultArgs(version)
 	args := internal.Args
 
 	// first look for settings in a gendal.toml config file
@@ -53,7 +58,7 @@ func main() {
 	err = viper.ReadInConfig()
 	if err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			fmt.Fprint(os.Stderr, "config file not found, use defaults")
+			fmt.Fprint(os.Stderr, "config file not found, using command line arguments\n")
 		} else {
 			fmt.Fprintf(os.Stderr, "unable to read the config file, %v", err)
 			os.Exit(1)
