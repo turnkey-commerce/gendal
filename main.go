@@ -52,8 +52,12 @@ func main() {
 	// Find and read the config file
 	err = viper.ReadInConfig()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "unable to read the config file, %v", err)
-		os.Exit(1)
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			fmt.Fprint(os.Stderr, "config file not found, use defaults")
+		} else {
+			fmt.Fprintf(os.Stderr, "unable to read the config file, %v", err)
+			os.Exit(1)
+		}
 	}
 
 	// Decode config file to the args.
