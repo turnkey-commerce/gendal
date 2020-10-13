@@ -147,3 +147,7 @@ PgtypeMode = 0
 # NullableProcParams toggle nullable types for stored procedure parameters.
 # (true or false)
 NullableProcParams = false
+
+# EnablePostgresJson toggles support for postgres json/jsonb.
+# (true or false)
+EnablePostgresJson = true
