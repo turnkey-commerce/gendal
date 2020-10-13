@@ -150,4 +150,4 @@ NullableProcParams = false
 
 # EnablePostgresJson toggles support for postgres json/jsonb.
 # (true or false)
-EnablePostgresJson = true
+EnablePostgresJson = false
