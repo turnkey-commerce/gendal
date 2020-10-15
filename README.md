@@ -154,6 +154,8 @@ options:
   --escape-column, -x    escape column names in SQL queries
   --enable-postgres-oids
                          enable postgres oids
+  --enable-postgres-json
+                         Change generated code for column type Json/Jsonb types to ColumnName type and call predefined marshallers/unmarshallers.
   --name-conflict-suffix NAME-CONFLICT-SUFFIX, -w NAME-CONFLICT-SUFFIX
                          suffix to append when a name conflicts with a Go variable [default: Val]
   --template-path TEMPLATE-PATH
@@ -745,12 +747,12 @@ for which sequences are associated with tables. All PK's will be assumed to be p
 by the database.
 
 ## PostgreSQL JSON/JSONB support
-* User set an option EnablePostgresJson=true in config (or --enable-postgres-json=true
+* The user sets an option EnablePostgresJson=true in config (or --enable-postgres-json=true
 in command line).
-* Gendal generates not Json/Jsonb type for field, but type with same name as field.
-* Then user defines this type with SQL interface functions: Scan and Value.
-* User can define UnmarshalJSON/MarshalJSON for this struct and simply call then in Scan and Value.
-* Also user can override generated type name to some predefined type with UnmarshalJSON/MarshalJSON
+* Gendal does not generate a Json/Jsonb type for the field, but rather a new type with the same name as the field.
+* Then the user defines this type with the SQL interface functions: Scan and Value.
+* The user can then define UnmarshalJSON/MarshalJSON for this struct and simply call in Scan and Value.
+* Also the user can override the generated type name to some predefined type with UnmarshalJSON/MarshalJSON
 and simply add Scan and Value.
 
 # Design, Origin, Philosophy, and History
