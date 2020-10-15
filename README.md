@@ -744,6 +744,15 @@ There is currently no method provided for Oracle as there is no programmatic way
 for which sequences are associated with tables. All PK's will be assumed to be provided
 by the database.
 
+## PostgreSQL JSON/JSONB support
+* User set an option EnablePostgresJson=true in config (or --enable-postgres-json=true
+in command line).
+* Gendal generates not Json/Jsonb type for field, but type with same name as field.
+* Then user defines this type with SQL interface functions: Scan and Value.
+* User can define UnmarshalJSON/MarshalJSON for this struct and simply call then in Scan and Value.
+* Also user can override generated type name to some predefined type with UnmarshalJSON/MarshalJSON
+and simply add Scan and Value.
+
 # Design, Origin, Philosophy, and History
 
 `gendal` can likely get you 99% "of the way there" on medium or large database
@@ -836,11 +845,11 @@ The following projects work with similar concepts as gendal:
 * Add support for supplying a file (ie, *.sql) for query generation
 * Add support for full text types (tsvector, tsquery on PostgreSQL)
 * Finish COMMENT support for PostgreSQL/MySQL and update templates accordingly.
-* Add support for JSON types (json, jsonb on PostgreSQL, json on MySQL)
+* Add support for JSON types (json on MySQL)
 * Add support for GIN index queries (PostgreSQL)
 
 # License
-This project is licensed under the MIT License. See the LICENSE file for the full text. 
+This project is licensed under the MIT License. See the LICENSE file for the full text.
 
 # Acknowledgements
 `gendal` is based on a fork of the [xo](https://github.com/xo/xo) repository maintained by [Kenneth Shaw](https://github.com/kenshaw).

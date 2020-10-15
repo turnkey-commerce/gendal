@@ -125,6 +125,9 @@ type ArgType struct {
 	// EnablePostgresOIDs toggles postgres oids.
 	EnablePostgresOIDs bool `arg:"--enable-postgres-oids,help:enable postgres oids"`
 
+	// EnablePostgresJson toggles support for postgres json/jsonb.
+	EnablePostgresJson bool `arg:"--enable-postgres-json,help:Change generated for column type Json/Jsonb types to ColumnNameType and call predefined marshallers/unmarshallers."`
+
 	// Sqlx allows for user to optionally add foreign key structs to generated types
 	// so that users can query foreign key tables using the sqlx library
 	Sqlx bool `arg:"--sqlx,help:adds foreign key relationship structs and query functions to generated types to use with sqlx library"`
