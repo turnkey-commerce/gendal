@@ -27,7 +27,7 @@ import (
 
 var (
 	// Version is the Semver version of the application.
-	version = "1.2.6"
+	version = "1.2.7"
 )
 
 func main() {
@@ -55,10 +55,12 @@ func main() {
 	viper.AddConfigPath(".")
 
 	// Find and read the config file
+	usingCommandLine := false
 	err = viper.ReadInConfig()
 	if err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			fmt.Fprint(os.Stderr, "config file not found, using command line arguments\n")
+			usingCommandLine = true
 		} else {
 			fmt.Fprintf(os.Stderr, "unable to read the config file, %v", err)
 			os.Exit(1)
@@ -73,7 +75,9 @@ func main() {
 	}
 
 	// parse args from command line
-	arg.MustParse(args)
+	if usingCommandLine {
+		arg.MustParse(args)
+	}
 
 	// process args
 	err = processArgs(args)
