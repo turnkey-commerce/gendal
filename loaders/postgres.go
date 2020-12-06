@@ -223,6 +223,12 @@ func PgQueryColumns(args *internal.ArgType, inspect []string) ([]*models.Column,
 	// load column information
 	result, err := models.PgTableColumns(args.DB, schema, xoid, false)
 
+	for _, col := range result {
+		if col.DataType == "json" || col.DataType == "jsonb" {
+			col.DataType = col.ColumnName
+		}
+	}
+
 	// delete temporary view
 	var dropq = `DROP VIEW ` + xoid
 	models.XOLog(dropq)
