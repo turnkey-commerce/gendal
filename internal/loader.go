@@ -68,7 +68,7 @@ type TypeLoader struct {
 }
 
 func (tl TypeLoader) ParseType(args *ArgType, dt string, nullable bool) (int, string, string) {
-	if entry, ok := args.internalTypeOverrides[dt]; ok {
+	if entry, ok := args.internalTypeOverrides[strings.ToLower(dt)]; ok {
 		if nullable {
 			return -1, entry.NullableNilValue, entry.NullableType
 		} else {
