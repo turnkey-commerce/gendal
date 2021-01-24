@@ -65,15 +65,15 @@ func main() {
 		}
 	}
 
+	// parse args from command line
+	arg.MustParse(args)
+
 	// Decode config file to the args.
 	err = viper.Unmarshal(&args)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "unable to decode into struct, %v", err)
 		os.Exit(1)
 	}
-
-	// parse args from command line
-	arg.MustParse(args)
 
 	// process args
 	err = processArgs(args)
