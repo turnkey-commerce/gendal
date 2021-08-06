@@ -90,6 +90,10 @@ $ go install ./models/
 $ go install ./mssqlmodels/
 ```
 
+> Note: For query generation, the same parameter can be used more than once by
+> referencing it without any type information. For example, the parameter 
+> `%%authorID int%%` can be referenced further in the query with `%%authorID%%`.
+
 ## Command Line Options
 
 Following are `gendal`'s command-line arguments and options. These options can also be set using a [configuration file](#using-a-configuration-file).
