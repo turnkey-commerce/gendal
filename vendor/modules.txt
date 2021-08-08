@@ -30,9 +30,9 @@ github.com/hashicorp/hcl/hcl/token
 github.com/hashicorp/hcl/json/parser
 github.com/hashicorp/hcl/json/scanner
 github.com/hashicorp/hcl/json/token
-# github.com/knq/snaker v0.0.0-20181215144011-2bc8a4db4687
+# github.com/kenshaw/snaker v0.1.6
 ## explicit
-github.com/knq/snaker
+github.com/kenshaw/snaker
 # github.com/lib/pq v1.7.1
 ## explicit
 github.com/lib/pq

@@ -5,7 +5,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"github.com/knq/snaker"
+	"github.com/kenshaw/snaker"
 
 	"github.com/turnkey-commerce/gendal/internal"
 	"github.com/turnkey-commerce/gendal/models"

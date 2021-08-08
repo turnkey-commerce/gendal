@@ -5,7 +5,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/knq/snaker"
+	"github.com/kenshaw/snaker"
 
 	"github.com/turnkey-commerce/gendal/models"
 )

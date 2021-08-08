@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/gedex/inflector"
-	"github.com/knq/snaker"
+	"github.com/kenshaw/snaker"
 )
 
 // ParseQuery takes the query in args and looks for strings in the form of
@@ -37,8 +37,8 @@ func (a *ArgType) ParseQuery(mask string, interpol bool) (string, []*QueryParam)
 	last := 0
 
 	var (
-		param *QueryParam
-		pstr string
+		param     *QueryParam
+		pstr      string
 		refExists bool
 	)
 
@@ -86,7 +86,7 @@ func (a *ArgType) ParseQuery(mask string, interpol bool) (string, []*QueryParam)
 
 			i++ // increment placeholder counter
 
-		// handle reference to existing param
+			// handle reference to existing param
 		} else {
 			if param, refExists = paramsMap[p[0]]; !refExists {
 				panic(fmt.Errorf("unknown parameter reference: %s", p[0]))
