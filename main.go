@@ -27,7 +27,7 @@ import (
 
 var (
 	// Version is the Semver version of the application.
-	version = "1.2.8"
+	version = "1.2.9"
 )
 
 func main() {
