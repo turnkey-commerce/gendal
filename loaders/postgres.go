@@ -8,7 +8,7 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/knq/snaker"
+	"github.com/kenshaw/snaker"
 
 	"github.com/turnkey-commerce/gendal/internal"
 	"github.com/turnkey-commerce/gendal/models"
