@@ -30,42 +30,68 @@ func (a *ArgType) ParseQuery(mask string, interpol bool) (string, []*QueryParam)
 
 	// return vals and placeholders
 	str := ""
-	params := []*QueryParam{}
+	paramsMap := make(map[string]*QueryParam, len(matches))
+	placeholderRefs := make(map[string]string, len(matches))
+	params := make([]*QueryParam, 0, len(matches))
 	i := 1
 	last := 0
 
+	var (
+		param *QueryParam
+		pstr string
+		refExists bool
+	)
+
 	// loop over matches, extracting each placeholder and splitting to name/type
 	for _, m := range matches {
-		// generate place holder value
-		pstr := mask
-		if strings.Contains(mask, "%d") {
-			pstr = fmt.Sprintf(mask, i)
-		}
-
 		// extract parameter info
 		paramStr := a.Query[m[0]+len(dl) : m[1]-len(dl)]
 		p := strings.SplitN(paramStr, " ", 2)
-		param := &QueryParam{
-			Name: p[0],
-			Type: p[1],
-		}
 
-		// parse parameter options if present
-		if strings.Contains(param.Type, ",") {
-			opts := strings.Split(param.Type, ",")
-			param.Type = opts[0]
-			for _, opt := range opts[1:] {
-				switch opt {
-				case "interpolate":
-					if !a.QueryInterpolate {
-						panic("query interpolate is not enabled")
+		// handle new query param
+		if len(p) == 2 {
+			param = &QueryParam{
+				Name: p[0],
+				Type: p[1],
+			}
+
+			// generate place holder value
+			pstr = mask
+			if strings.Contains(mask, "%d") {
+				pstr = fmt.Sprintf(mask, i)
+			}
+
+			// keep reference of param and placeholder for future references
+			paramsMap[param.Name] = param
+			placeholderRefs[param.Name] = pstr
+			params = append(params, param) // keep params in order (needed for template generation)
+
+			// parse parameter options if present
+			if strings.Contains(param.Type, ",") {
+				opts := strings.Split(param.Type, ",")
+				param.Type = opts[0]
+				for _, opt := range opts[1:] {
+					switch opt {
+					case "interpolate":
+						if !a.QueryInterpolate {
+							panic("query interpolate is not enabled")
+						}
+						param.Interpolate = true
+
+					default:
+						panic(fmt.Errorf("unknown option encountered on query parameter '%s'", paramStr))
 					}
-					param.Interpolate = true
-
-				default:
-					panic(fmt.Errorf("unknown option encountered on query parameter '%s'", paramStr))
 				}
 			}
+
+			i++ // increment placeholder counter
+
+		// handle reference to existing param
+		} else {
+			if param, refExists = paramsMap[p[0]]; !refExists {
+				panic(fmt.Errorf("unknown parameter reference: %s", p[0]))
+			}
+			pstr = placeholderRefs[param.Name]
 		}
 
 		// add to string
@@ -81,9 +107,7 @@ func (a *ArgType) ParseQuery(mask string, interpol bool) (string, []*QueryParam)
 			str = str + pstr
 		}
 
-		params = append(params, param)
 		last = m[1]
-		i++
 	}
 
 	// add part of query remains
